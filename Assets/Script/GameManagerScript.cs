@@ -1,13 +1,16 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System;
+using System.Collections.Generic;
 
 public class GameManagerScript : MonoBehaviour
 {
     public Text nameText;
+    public Text nameListText;
     public Text timeText;
     public GameObject character1;
     public GameObject character2;
+    private string names="";
     void Start()
     {
         nameText.text =  PlayerPrefs.GetString("PlayerName", "Player");
@@ -27,10 +30,20 @@ public class GameManagerScript : MonoBehaviour
                     break;
             }
         }
-        
     }
     void Update()
     {
+        names = "";
+        GameObject[] targetObjects = GameObject.FindGameObjectsWithTag("NPC");
+        foreach (GameObject targetObject in targetObjects)
+        {
+            Text text = targetObject.GetComponent<Text>();
+
+            if (text != null)
+            {
+                names += text.text + "\n";
+            }
+        }
         nameText.text = PlayerPrefs.GetString("PlayerName", "Player");
         string character = PlayerPrefs.GetString("PlayerCharcter", "PlayerCharcter");
         if (character != null)
@@ -46,5 +59,7 @@ public class GameManagerScript : MonoBehaviour
             }
         }
         timeText.text = DateTime.Now.ToString("HH:mm:ss");
+        names += nameText.text;
+        nameListText.text = names;
     }
 }
