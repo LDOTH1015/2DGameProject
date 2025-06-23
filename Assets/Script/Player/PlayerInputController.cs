@@ -26,6 +26,11 @@ public class PlayerInputController : TopDownController
     }
     public void OnFire(InputValue value)
     {
-        Debug.Log("OnFire" + value.ToString());
+        CallFireEvent();
+    }
+
+    public void OnEvasion(InputValue value)
+    {
+        CallEvasionEvent();
     }
 }
