@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlaterStatus : MonoBehaviour
+public class PlayerStatus : Singleton<PlayerStatus>
 {
     public float maxHp;
     public float curruntHP;
-    public float maxStamina;
-    public float curruntStamina;
+    public float maxStamina = 200;
+    public float curruntStamina = 200;
     public float attackPower;
     public float defense;
     public float evasion;
@@ -15,4 +15,10 @@ public class PlaterStatus : MonoBehaviour
     public float criticalDamage;
     public float moveSpeed;
     public float resistance;
+
+    private void Update()
+    {
+        if (curruntStamina <= maxStamina)
+            curruntStamina += 0.1f;
+    }
 }

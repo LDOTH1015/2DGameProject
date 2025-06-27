@@ -46,7 +46,7 @@ public class TopDownMovement : MonoBehaviour
         {
             Vector2 shootDirection = (nearestEnemy.transform.position - this.transform.position).normalized;
             Arrow projectile = arrowPool.Get(this.transform.position, Quaternion.identity);
-            //projectile.Initialize(shootDirection, PlayerStatus.Instance.baseDamage, State.Range);
+            projectile.Initialize(shootDirection, 10, 5f);
         }
     }
 
@@ -72,10 +72,9 @@ public class TopDownMovement : MonoBehaviour
     {
         if (isEvasion) return;
 
-        //추후 스테미너를 사용하여 회피를 위한 스테미너 양 체크 코드
-        if (true)
+        if (PlayerStatus.Instance.curruntStamina >= 50)
         {
-            Debug.Log(movementDirection);
+            PlayerStatus.Instance.curruntStamina -= 50;
             StartCoroutine(EvasionCoroutine(movementDirection));
         }
     }
