@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7871361999556051969}
   - component: {fileID: 6733238656803917240}
   - component: {fileID: 6781745483222856283}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -119,6 +119,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d420ac337e0fef14f85f530f8d9c1ed3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  arrow: {fileID: -4231522420556015222, guid: d89caeb77048ab64ca497aab7f9f6079, type: 3}
 --- !u!61 &6733238656803917240
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -178,9 +179,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   armRenderer: {fileID: 7805396988507343600}
   armPivot1: {fileID: 5526112939679083229}
-  armPivot2: {fileID: 0}
   characterRenderer1: {fileID: 6199861653581408137}
-  characterRenderer2: {fileID: 0}
 --- !u!1 &2565554794933937080
 GameObject:
   m_ObjectHideFlags: 0
@@ -192,7 +191,7 @@ GameObject:
   - component: {fileID: 699610893441693281}
   - component: {fileID: 6199861653581408137}
   - component: {fileID: 8933468833030855026}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: MainSprite1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -298,7 +297,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7559968375406820588}
   - component: {fileID: 7805396988507343600}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: WeaponSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -381,7 +380,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5526112939679083229}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: WeaponPivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -414,7 +413,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2960320053418672511}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: BuiletSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}

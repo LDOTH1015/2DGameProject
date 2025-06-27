@@ -7,6 +7,7 @@ TagManager:
   - NPC
   - Monster
   - Weapon
+  - Topography
   layers:
   - Default
   - TransparentFX

@@ -1,9 +1,8 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class TopDownMovement : MonoBehaviour
+public class TopDownMovement : MonoBehaviour, IDamageable
 {
     private TopDownController controller;
     private Rigidbody2D movementRigidbody;
@@ -17,6 +16,8 @@ public class TopDownMovement : MonoBehaviour
 
     private float evasionDuraion = 0.2f;
     private float evationSpeed = 16.0f;
+
+    [SerializeField] private GameObject endPanel;
 
     private void Awake()
     {
@@ -46,7 +47,7 @@ public class TopDownMovement : MonoBehaviour
         {
             Vector2 shootDirection = (nearestEnemy.transform.position - this.transform.position).normalized;
             Arrow projectile = arrowPool.Get(this.transform.position, Quaternion.identity);
-            projectile.Initialize(shootDirection, 10, 5f);
+            projectile.Initialize(shootDirection, 10, 5f);            
         }
     }
 
@@ -116,5 +117,39 @@ public class TopDownMovement : MonoBehaviour
         direction = direction * 5;
         
         movementRigidbody.velocity = direction;
+    }
+
+    public void TakeDamage(float amount)
+    {
+        if (PlayerStatus.Instance.curruntHP - amount <= 0f)
+        {
+            IsDeadMan();
+        }
+        else 
+        {
+            PlayerStatus.Instance.curruntHP -= amount;
+        }
+    }
+
+    public void KnockBack(float knockbackPower)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void TakeDotDamage(float amount, float duration, float interval)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool IsDeadMan()
+    {
+        endPanel.SetActive(true);
+        Time.timeScale = 0f;
+        return true;
+    }
+
+    public Vector3 GetPosition()
+    {
+        throw new NotImplementedException();
     }
 }

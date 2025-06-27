@@ -28,5 +28,7 @@ public class GameManagerScript : MonoBehaviour
                 names += text.text + "\n";
             }
         }
+
+
     }
 }
