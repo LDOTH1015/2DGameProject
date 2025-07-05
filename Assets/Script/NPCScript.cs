@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class NPCScript : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class NPCScript : MonoBehaviour
 
     private Transform thisTransform;
 
+    public PlayerInput playerInput;
+    [SerializeField]private bool isActive = true;
+
     void Start()
     {
         thisTransform = transform;
@@ -19,15 +23,23 @@ public class NPCScript : MonoBehaviour
 
     void Update()
     {
-        float distance = Vector3.Distance(thisTransform.position, playerTransform.position);
+        if (isActive)
+        {
+            float distance = Vector3.Distance(thisTransform.position, playerTransform.position);
 
-        if (distance <= activationRange)
-        {
-            objectToActivate.SetActive(true);
-        }
-        else
-        {
-            objectToActivate.SetActive(false);
+            if (distance <= activationRange)
+            {
+                string[] nullLines = null;
+                objectToActivate.SetActive(true);
+                objectToActivate.GetComponent<ConversationUI>().StartDialogue(nullLines);
+                playerInput.enabled = false;
+                isActive = false;
+            }
+            else
+            {
+                objectToActivate.SetActive(false);
+                playerInput.enabled = true;
+            }
         }
     }
 }

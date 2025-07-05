@@ -9,6 +9,7 @@ public class GameManagerScript : MonoBehaviour
     [SerializeField] private Image staminaFillamount;
     private string names="";
     private PlayerStatus status;
+    
     void Start()
     {
         PlayerPrefs.SetString("PlayerCharcter", "character1");
@@ -28,7 +29,5 @@ public class GameManagerScript : MonoBehaviour
                 names += text.text + "\n";
             }
         }
-
-
     }
 }

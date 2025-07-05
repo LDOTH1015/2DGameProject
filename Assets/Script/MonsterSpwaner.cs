@@ -7,6 +7,7 @@ public class MonsterSpwaner : MonoBehaviour
     [SerializeField] private Monster monster;
     private ObjectPool<Monster> monsterPool;
     [SerializeField] private GameObject target;
+    public bool isSpawn = false;
 
     private int count = 0;
 
@@ -16,21 +17,28 @@ public class MonsterSpwaner : MonoBehaviour
     private void Start()
     {
         monsterPool = new ObjectPool<Monster>(monster, 5, transform);
+        SpwanSystem.Instance.spwanSystems.Add(this);
     }
 
     private void Update()
     {
-        if (count >= 5) return; // 5마리 초과 시 스폰 중단
-
-        spawnTimer += Time.deltaTime;
-
-        if (spawnTimer >= spawnDelay)
+        if (isSpawn)
         {
-            spawnTimer = 0f;
+            if (count >= 5)
+            {
+                isSpawn = false;
+                return; // 5마리 초과 시 스폰 중단
+            }
+            spawnTimer += Time.deltaTime;
 
-            Monster m = Instantiate(monster, transform.position, Quaternion.identity);
-            m.Initialize(target);
-            count++;
+            if (spawnTimer >= spawnDelay)
+            {
+                spawnTimer = 0f;
+
+                Monster m = Instantiate(monster, transform.position, Quaternion.identity);
+                m.Initialize(target);
+                count++;
+            }
         }
     }
 }

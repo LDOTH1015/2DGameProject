@@ -2,17 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpwanSystem : MonoBehaviour
+public class SpwanSystem : Singleton<SpwanSystem>
 {
-    // Start is called before the first frame update
+    private int countStage;
+    public List<MonsterSpwaner> spwanSystems = new List<MonsterSpwaner>();
     void Start()
     {
-        
+        countStage = 0;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void StartSpwaner()
     {
-        
+        foreach (var spwaner in spwanSystems)
+        {
+            spwaner.isSpawn = true;
+        }
+        countStage++;
     }
 }
