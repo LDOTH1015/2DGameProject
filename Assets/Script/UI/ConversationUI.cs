@@ -1,15 +1,14 @@
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class ConversationUI : MonoBehaviour
 {
     [SerializeField] private GameObject dialoguePanel;
     [SerializeField] private TextMeshProUGUI dialogueText;
-    [SerializeField] private GameObject FigthButton;
-    [SerializeField] private GameObject PrayButton;
-    [SerializeField] private GameObject select3in1;
+    [SerializeField] private GameObject SelectButtons;
+    public PlayerInput playerInput;
 
     private Queue<string> sentences = new Queue<string>();
     private bool isDialogueActive = false;
@@ -53,22 +52,29 @@ public class ConversationUI : MonoBehaviour
     void EndDialogue()
     {
         dialogueText.gameObject.SetActive(false);
-        FigthButton.SetActive(true);
-        PrayButton.SetActive(true);
+        SelectButtons.SetActive(true);
         //dialoguePanel.SetActive(false);
         //isDialogueActive = false;
     }
 
     public void OnClickFight()
     {
-
+        playerInput.enabled = true;
+        isDialogueActive = false;
+        dialoguePanel.SetActive(false);
     }
 
     public void OnClickPray()
     {
-        dialoguePanel.SetActive(false);
+        playerInput.enabled = true;
         isDialogueActive = false;
-        select3in1.SetActive(true);
-        
+        dialoguePanel.SetActive(false);
+    }
+
+    public void OnClickBack()
+    {
+        playerInput.enabled = true;
+        isDialogueActive = false;
+        dialoguePanel.SetActive(false);
     }
 }

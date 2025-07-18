@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class PlayerStatus : Singleton<PlayerStatus>
 {
-    public float maxHp;
-    public float curruntHP;
+    public float maxHp = 200;
+    public float curruntHP = 200;
     public float maxStamina = 200;
     public float curruntStamina = 200;
     public float attackPower;
@@ -20,5 +20,7 @@ public class PlayerStatus : Singleton<PlayerStatus>
     {
         if (curruntStamina <= maxStamina)
             curruntStamina += 0.1f;
+        if (curruntHP <= maxHp)
+            curruntHP += 0.1f;
     }
 }

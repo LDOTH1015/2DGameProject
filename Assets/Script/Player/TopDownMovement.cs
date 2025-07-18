@@ -18,6 +18,7 @@ public class TopDownMovement : MonoBehaviour, IDamageable
     private float evationSpeed = 16.0f;
 
     [SerializeField] private GameObject endPanel;
+    [SerializeField] private GameObject inventory;
 
     private void Awake()
     {
@@ -32,6 +33,8 @@ public class TopDownMovement : MonoBehaviour, IDamageable
         controller.OnMoveEvent += Move;
         controller.OnEvasionEvent += Evasion;
         controller.OnFireEvent += Fire;
+        controller.OnInvenEvent += Inven;
+        controller.OnPotionEvent += Potion;
     }
 
     private void Move(Vector2 direction)
@@ -40,6 +43,15 @@ public class TopDownMovement : MonoBehaviour, IDamageable
         movementDirection = direction;
     }
 
+    private void Inven()
+    {
+        inventory.SetActive(true);
+    }
+
+    private void Potion()
+    {
+        
+    }
     private void Fire()
     {
         GameObject nearestEnemy = FindNearestEnemy();

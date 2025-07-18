@@ -8,6 +8,8 @@ public class TopDownController : MonoBehaviour
     public event Action<Vector2> OnLookEvent;
     public event Action OnFireEvent;
     public event Action OnEvasionEvent;
+    public event Action OnInvenEvent;
+    public event Action OnPotionEvent;
 
     public void CallMoveEvent(Vector2 direction)
     {
@@ -26,5 +28,15 @@ public class TopDownController : MonoBehaviour
     public void CallEvasionEvent()
     {
         OnEvasionEvent?.Invoke();
+    }
+
+    public void CallInvenEvent()
+    {
+        OnInvenEvent?.Invoke();
+    }
+
+    public void CallPotionEvent()
+    {
+        OnPotionEvent?.Invoke();
     }
 }

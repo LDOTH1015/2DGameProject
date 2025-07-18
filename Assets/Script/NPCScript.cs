@@ -14,7 +14,8 @@ public class NPCScript : MonoBehaviour
     private Transform thisTransform;
 
     public PlayerInput playerInput;
-    [SerializeField]private bool isActive = true;
+
+    private bool isActived = false;
 
     void Start()
     {
@@ -23,7 +24,7 @@ public class NPCScript : MonoBehaviour
 
     void Update()
     {
-        if (isActive)
+        if (!GameManagerScript.Instance.isStageStarted && !isActived)
         {
             float distance = Vector3.Distance(thisTransform.position, playerTransform.position);
 
@@ -33,7 +34,7 @@ public class NPCScript : MonoBehaviour
                 objectToActivate.SetActive(true);
                 objectToActivate.GetComponent<ConversationUI>().StartDialogue(nullLines);
                 playerInput.enabled = false;
-                isActive = false;
+                StartCoroutine(ActivateThenCancelCoroutine());
             }
             else
             {
@@ -41,5 +42,14 @@ public class NPCScript : MonoBehaviour
                 playerInput.enabled = true;
             }
         }
+    }
+
+    private IEnumerator ActivateThenCancelCoroutine()
+    {
+        isActived = true;
+
+        yield return new WaitForSeconds(30f);
+
+        isActived = false;
     }
 }

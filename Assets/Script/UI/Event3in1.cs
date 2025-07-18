@@ -11,6 +11,7 @@ public class Event3in1 : MonoBehaviour
     {
         NPCScript.enabled = true;
         SpwanSystem.Instance.StartSpwaner();
+        GameManagerScript.Instance.isStageStarted = true;
         UI3in1.SetActive(false);
     }
 }

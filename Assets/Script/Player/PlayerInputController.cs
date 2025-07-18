@@ -32,4 +32,14 @@ public class PlayerInputController : TopDownController
     {
         CallEvasionEvent();
     }
+
+    public void OnInventory(InputValue value) 
+    {
+        CallInvenEvent();
+    }
+
+    public void OnPotion(InputValue value)
+    {
+        CallInvenEvent();
+    }
 }
