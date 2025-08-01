@@ -1,15 +1,22 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class Monster : MonoBehaviour, IDamageable
 {
     [Header("Settings")]
     [SerializeField] private float moveSpeed = 2f;
     [SerializeField] private float playerDetectRange = 5f;
+    [SerializeField] private float attackRange = 1f;
+    [SerializeField] private float attackDamage = 10f;
+    [SerializeField] private float attackDelay = 1f;
 
     private float HP = 100f;
     private GameObject target;
     private Transform targetTransform;
     private Rigidbody2D rb;
+
+    private bool canAttack = true;
+    private bool isInAttackRange = false;
 
     private void Awake()
     {
@@ -26,7 +33,24 @@ public class Monster : MonoBehaviour, IDamageable
     private void Update()
     {
         SearchPlayer();
-        MoveToTarget();
+
+        if (targetTransform != null)
+        {
+            float distance = Vector2.Distance(transform.position, targetTransform.position);
+
+            if (distance <= attackRange)
+            {
+                rb.velocity = Vector2.zero;
+                if (canAttack)
+                {
+                    StartCoroutine(Attack());
+                }
+            }
+            else
+            {
+                MoveToTarget();
+            }
+        }
     }
 
     private void SearchPlayer()
@@ -51,10 +75,22 @@ public class Monster : MonoBehaviour, IDamageable
         rb.velocity = direction * moveSpeed;
     }
 
-    public Vector3 GetPosition()
+    private IEnumerator Attack()
     {
-        return transform.position;
+        canAttack = false;
+        if (target != null)
+        {
+            TopDownMovement player = target.GetComponent<TopDownMovement>();
+            if (player != null)
+            {
+                player.TakeDamage(attackDamage);
+            }
+        }
+        yield return new WaitForSeconds(attackDelay);
+        canAttack = true;
     }
+
+    public Vector3 GetPosition() => transform.position;
 
     public bool IsDeadMan()
     {
@@ -80,13 +116,5 @@ public class Monster : MonoBehaviour, IDamageable
     public void TakeDotDamage(float amount, float duration, float interval)
     {
         Debug.Log($"Monster took DOT {amount} damage for {duration} seconds every {interval} seconds!");
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            collision.gameObject.GetComponent<TopDownMovement>().TakeDamage(10f);
-        }
     }
 }

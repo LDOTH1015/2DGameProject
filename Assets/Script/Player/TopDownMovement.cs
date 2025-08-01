@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TopDownMovement : MonoBehaviour, IDamageable
 {
@@ -18,6 +19,7 @@ public class TopDownMovement : MonoBehaviour, IDamageable
     private float evationSpeed = 16.0f;
 
     [SerializeField] private GameObject endPanel;
+    [SerializeField] private Image potion;
     [SerializeField] private GameObject inventory;
 
     private void Awake()
@@ -50,7 +52,15 @@ public class TopDownMovement : MonoBehaviour, IDamageable
 
     private void Potion()
     {
-        
+        if (PlayerStatus.Instance.curruntHP + 50 >= PlayerStatus.Instance.maxHp)
+        {
+            PlayerStatus.Instance.curruntHP = PlayerStatus.Instance.maxHp;
+        } else
+        {
+            PlayerStatus.Instance.curruntHP += 50;
+        }
+        potion.fillAmount = 1;
+        //인벤토리내 포션 갯수 감소 코드
     }
     private void Fire()
     {

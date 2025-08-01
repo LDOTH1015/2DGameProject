@@ -40,6 +40,6 @@ public class PlayerInputController : TopDownController
 
     public void OnPotion(InputValue value)
     {
-        CallInvenEvent();
+        CallPotionEvent();
     }
 }
