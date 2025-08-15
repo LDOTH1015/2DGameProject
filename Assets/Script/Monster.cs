@@ -10,15 +10,15 @@ public class Monster : MonoBehaviour, IDamageable
     [SerializeField] private float attackDamage = 10f;
     [SerializeField] private float attackDelay = 1f;
 
-    private float HP = 100f;
+    protected float HP = 100f;
     private GameObject target;
-    private Transform targetTransform;
+    protected Transform targetTransform;
     private Rigidbody2D rb;
 
     private bool canAttack = true;
     private bool isInAttackRange = false;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
     }
@@ -30,7 +30,7 @@ public class Monster : MonoBehaviour, IDamageable
         targetTransform = target.transform;
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         SearchPlayer();
 
@@ -104,7 +104,7 @@ public class Monster : MonoBehaviour, IDamageable
         rb.AddForce(knockbackDir * knockbackPower, ForceMode2D.Impulse);
     }
 
-    public void TakeDamage(float amount)
+    public virtual void TakeDamage(float amount)
     {
         HP -= amount;
         if (HP <= 0f)
