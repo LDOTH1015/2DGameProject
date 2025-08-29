@@ -4,19 +4,19 @@ using UnityEngine;
 public class Monster : MonoBehaviour, IDamageable
 {
     [Header("Settings")]
-    [SerializeField] private float moveSpeed = 2f;
-    [SerializeField] private float playerDetectRange = 5f;
-    [SerializeField] private float attackRange = 1f;
-    [SerializeField] private float attackDamage = 10f;
-    [SerializeField] private float attackDelay = 1f;
+    [SerializeField] protected float moveSpeed = 2f;
+    [SerializeField] protected float playerDetectRange = 5f;
+    [SerializeField] protected float attackRange = 1f;
+    [SerializeField] protected float attackDamage = 10f;
+    [SerializeField] protected float attackDelay = 1f;
 
     protected float HP = 100f;
-    private GameObject target;
+    protected GameObject target;
     protected Transform targetTransform;
-    private Rigidbody2D rb;
+    protected Rigidbody2D rb;
 
-    private bool canAttack = true;
-    private bool isInAttackRange = false;
+    protected bool canAttack = true;
+    protected bool isInAttackRange = false;
 
     protected virtual void Awake()
     {
