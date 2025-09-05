@@ -1,133 +1,133 @@
 using System.Collections;
 using UnityEngine;
 
-public class Bag : Monster
+public class BagMonster : Monster
 {
     [Header("Charge Settings")]
-    [SerializeField] private float chargeInterval = 3f;   // n초마다 한 번 시도
-    [SerializeField] private float windupTime = 0.5f;     // 돌진 0.5초 전(준비 시간)
-    [SerializeField] private float chargeDistance = 5f;   // 직선으로 이동할 거리
-    [SerializeField] private float chargeSpeed = 12f;     // 돌진 속도
+    [SerializeField] private float chargeInterval = 3f;   // n초마다 돌진
+    [SerializeField] private float windupTime = 0.5f;     // 돌진 준비 시간(게이지 차는 시간)
+    [SerializeField] private float chargeDistance = 6f;   // 돌진 거리
+    [SerializeField] private float chargeSpeed = 14f;     // 돌진 속도
 
-    private Rigidbody2D _rb;          // 자체 참조(부모의 rb는 private이므로 별도 보관)
-    private float _cooldown = 0f;     // 다음 돌진까지 남은 시간
-    private bool _isWindup = false;   // 준비 중
-    private bool _isCharging = false; // 돌진 중
+    [Header("Visual")]
+    [SerializeField] private SpriteRenderer spriteRenderer;  // 바라보는 방향 전환용
+    [SerializeField] private RangeBag indicator;      // 가방 자식에 둔 IndicatorRoot
+
+    private float cooldown;
+    private bool isWindup = false;
+    private bool isCharging = false;
 
     protected override void Awake()
     {
         base.Awake();
-        _rb = GetComponent<Rigidbody2D>();
-        _cooldown = chargeInterval;
+        cooldown = chargeInterval;
+
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    // 기본 근접공격 로직을 쓰지 않고, '돌진' 전용 로직으로 교체
     protected override void Update()
     {
-        // 플레이어 탐색(부모의 SearchPlayer는 private이라 동일 로직을 여기서 수행)
-        if (targetTransform == null)
-        {
-            GameObject player = GameObject.FindWithTag("Player");
-            if (player != null)
-            {
-                float dist = Vector2.Distance(transform.position, player.transform.position);
-                if (dist <= playerDetectRange)
-                {
-                    // 부모의 target/targetTransform은 각각 private/protected
-                    // targetTransform은 protected라 접근 가능
-                    targetTransform = player.transform;
-                }
-            }
-        }
+        // 플레이어 탐색
+        SearchPlayer();
+        FaceTarget();
 
-        // 준비/돌진 중이면 외부 입력(추적) 끔
-        if (_isWindup || _isCharging)
-        {
-            return;
-        }
+        if (isWindup || isCharging) return;
 
-        // 쿨타임 감소
-        if (_cooldown > 0f)
-        {
-            _cooldown -= Time.deltaTime;
-        }
+        if (cooldown > 0f)
+            cooldown -= Time.deltaTime;
 
-        // 쿨이 끝났고, 타겟이 있으면 돌진 루틴 시작
-        if (_cooldown <= 0f && targetTransform != null)
+        if (cooldown <= 0f && targetTransform != null)
         {
             StartCoroutine(WindupAndCharge());
             return;
         }
 
-        // 평소에는 플레이어를 향해 걷기(부모 MoveToTarget은 private이라 동일 로직 구현)
         if (targetTransform != null)
-        {
-            Vector2 dir = ((Vector2)targetTransform.position - (Vector2)transform.position).normalized;
-            _rb.velocity = dir * moveSpeed;
-        }
+            MoveToTarget();
         else
-        {
-            _rb.velocity = Vector2.zero;
-        }
+            rb.velocity = Vector2.zero;
+    }
+
+    /// <summary>
+    /// 플레이어 위치를 바라보게 flip 처리
+    /// (기본 스프라이트가 ↙ 기준이라고 가정)
+    /// </summary>
+    private void FaceTarget()
+    {
+        if (spriteRenderer == null || targetTransform == null) return;
+
+        Vector2 toTarget = (Vector2)targetTransform.position - (Vector2)transform.position;
+        if (toTarget.sqrMagnitude < 0.0001f) return;
+
+        spriteRenderer.flipX = toTarget.x > 0f;
+        spriteRenderer.flipY = toTarget.y > 0f;
     }
 
     private IEnumerator WindupAndCharge()
     {
-        _isWindup = true;
-        _rb.velocity = Vector2.zero;
+        isWindup = true;
+        rb.velocity = Vector2.zero;
 
-        // 0.5초 전의 플레이어 위치 스냅샷
-        Vector2 snapshotPlayerPos = targetTransform != null
+        // 스냅샷 방향 (가방 → 플레이어)
+        Vector2 snapshotPos = targetTransform != null
             ? (Vector2)targetTransform.position
             : (Vector2)transform.position;
+        Vector2 dir = (snapshotPos - (Vector2)transform.position).normalized;
+        if (dir.sqrMagnitude < 0.0001f) dir = Vector2.down;
 
-        // 준비 시간(이때 애니메이션/사운드/이펙트 넣으면 좋음)
-        yield return new WaitForSeconds(windupTime);
-
-        _isWindup = false;
-
-        // 스냅샷 지점까지의 방향을 '단 하나'로 고정
-        Vector2 dir = (snapshotPlayerPos - (Vector2)transform.position).normalized;
-        if (dir.sqrMagnitude < 0.0001f)
+        // === 인디케이터 표시 ===
+        if (indicator != null)
         {
-            // 같은 자리거나 너무 가까우면 임의의 오른쪽 방향
-            dir = Vector2.right;
+            indicator.gameObject.SetActive(true);
+            indicator.Show(dir, windupTime);
         }
 
-        _isCharging = true;
+        // 준비 시간 동안 게이지 차오름
+        yield return new WaitForSeconds(windupTime);
 
-        // 지정 거리만큼만 직선 이동 (물리 프레임마다 MovePosition으로 정확한 거리 관리)
+        if (indicator != null) indicator.HideImmediate();
+
+        isWindup = false;
+        isCharging = true;
+
+        // === 실제 돌진 ===
         float remaining = chargeDistance;
         while (remaining > 0f)
         {
             float step = chargeSpeed * Time.deltaTime;
             if (step > remaining) step = remaining;
 
-            Vector2 delta = dir * step;
-            _rb.MovePosition(_rb.position + delta);
-
+            rb.MovePosition(rb.position + dir * step);
             remaining -= step;
             yield return null;
         }
 
-        // 돌진 종료
-        _rb.velocity = Vector2.zero;
-        _isCharging = false;
-        _cooldown = chargeInterval;
+        rb.velocity = Vector2.zero;
+        isCharging = false;
+        cooldown = chargeInterval;
     }
 
-    // (선택) 에디터에서 돌진 거리 가시화
-    private void OnDrawGizmosSelected()
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if (!Application.isPlaying) return;
-        if (_isCharging || _isWindup) return;
+        if (!isCharging) return;
 
-        Gizmos.color = Color.red;
-        if (targetTransform != null)
+        if (other.CompareTag("Player"))
         {
-            // 현재 기준, 스냅샷이 아닌 '지금' 방향으로 미리보기 라인
-            Vector2 dir = ((Vector2)targetTransform.position - (Vector2)transform.position).normalized;
-            Gizmos.DrawLine(transform.position, (Vector2)transform.position + dir * chargeDistance);
+            var player = other.GetComponent<TopDownMovement>();
+            if (player != null)
+                player.TakeDamage(attackDamage);
+            return; // 플레이어는 맞고 계속 돌진
+        }
+
+        if (other.CompareTag("Wall"))
+        {
+            // 벽 충돌 시 돌진 종료
+            isCharging = false;
+            rb.velocity = Vector2.zero;
+            cooldown = chargeInterval;
+
+            if (indicator != null) indicator.HideImmediate();
         }
     }
 }

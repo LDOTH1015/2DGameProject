@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class Range : MonoBehaviour
+public class RangeBoom : MonoBehaviour
 {
     [Header("Settings")]
     [SerializeField] private float growDuration = 0.55f; // 커지는 시간

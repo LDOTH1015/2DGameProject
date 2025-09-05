@@ -8,6 +8,7 @@ TagManager:
   - Monster
   - Weapon
   - Topography
+  - Wall
   layers:
   - Default
   - TransparentFX

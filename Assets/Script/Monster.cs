@@ -53,7 +53,7 @@ public class Monster : MonoBehaviour, IDamageable
         }
     }
 
-    private void SearchPlayer()
+    protected void SearchPlayer()
     {
         GameObject player = GameObject.FindWithTag("Player");
         if (player != null)
@@ -67,7 +67,7 @@ public class Monster : MonoBehaviour, IDamageable
         }
     }
 
-    private void MoveToTarget()
+    protected void MoveToTarget()
     {
         if (targetTransform == null) return;
 
@@ -75,7 +75,7 @@ public class Monster : MonoBehaviour, IDamageable
         rb.velocity = direction * moveSpeed;
     }
 
-    private IEnumerator Attack()
+    protected IEnumerator Attack()
     {
         canAttack = false;
         if (target != null)
