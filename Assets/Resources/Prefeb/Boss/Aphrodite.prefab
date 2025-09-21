@@ -104,9 +104,9 @@ MonoBehaviour:
   attackRange: 1
   attackDamage: 10
   attackDelay: 1
-  mapAreaObject: {fileID: 0}
+  mapAreaObject: {fileID: 4639988181318794089, guid: 837263e476e8ba742b9571819fa08940, type: 3}
   bombPrefab: {fileID: 9113207933387510164, guid: b2d70e1f4177d1f4fb80d4a8fef9e5f9, type: 3}
-  minionPrefab: {fileID: 0}
+  minionPrefab: {fileID: 8004359768206359241, guid: 8f2d7a2fefa76624d9d9e3411cd68e30, type: 3}
   bombSpawnInterval: 3
   bombsPerWave: 3
   bombSafeRadiusFromPlayer: 0.8

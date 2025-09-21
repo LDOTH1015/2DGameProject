@@ -15,10 +15,9 @@ public class TopDownMovement : MonoBehaviour, IDamageable
     private Vector2 movementDirection = Vector2.zero;
     private bool isEvasion = false;
 
-    // === 방향 전환용 ===
     [Header("Visual (Child)")]
     [SerializeField] private Transform visualRoot;   // 예: MainSprite1
-    private SpriteRenderer spriteRenderer;           // visualRoot에서 가져옴
+    private SpriteRenderer spriteRenderer;
     private Vector2 lastNonZeroInput = Vector2.right;
 
     private float evasionDuraion = 0.2f;
@@ -28,6 +27,19 @@ public class TopDownMovement : MonoBehaviour, IDamageable
     [SerializeField] private Image potion;
     [SerializeField] private GameObject inventory;
 
+    // === 근접 베기용 ===
+    [Header("Melee Slash")]
+    [SerializeField] private TopDownAimRotation aim;     // Aim 스크립트 참조
+    [SerializeField] private Transform weaponRoot;       // 검 루트 (스케일 변경 대상)
+    [SerializeField] private Collider2D weaponCollider;  // 검 충돌체 (베기 중에만 ON)
+    [SerializeField] private float slashDuration = 0.5f; // 0.5초 동안 휘두름
+    [SerializeField] private float slashArcDeg = 90f;    // ±45도 (총 90도 회전)
+    [SerializeField] private string attackTriggerName = "Attack";
+
+    private bool isAttacking = false;
+    private int attackIndex = 0; // 1,2,(3=강공)->0
+    private Vector3 weaponDefaultScale;
+
     private void Awake()
     {
         controller = GetComponent<TopDownController>();
@@ -35,7 +47,6 @@ public class TopDownMovement : MonoBehaviour, IDamageable
         movementRigidbody = GetComponent<Rigidbody2D>();
         arrowPool = new ObjectPool<Arrow>(arrow, 5, transform);
 
-        // --- 방향 전환 참조 세팅 ---
         if (visualRoot == null)
         {
             var t = transform.Find("MainSprite1");
@@ -46,6 +57,8 @@ public class TopDownMovement : MonoBehaviour, IDamageable
             spriteRenderer = visualRoot.GetComponent<SpriteRenderer>();
         if (spriteRenderer == null)
             Debug.LogWarning("[TopDownMovement] SpriteRenderer를 찾지 못했습니다. MainSprite1에 SpriteRenderer가 있는지 확인하세요.");
+
+        if (weaponRoot != null) weaponDefaultScale = weaponRoot.localScale;
     }
 
     private void Start()
@@ -55,17 +68,17 @@ public class TopDownMovement : MonoBehaviour, IDamageable
         controller.OnFireEvent += Fire;
         controller.OnInvenEvent += Inven;
         controller.OnPotionEvent += Potion;
+
+        if (weaponCollider != null) weaponCollider.enabled = false;
     }
 
     private void Move(Vector2 direction)
     {
-        if (isEvasion) return;
+        if (isEvasion || isAttacking) return;
         movementDirection = direction;
 
-        // 이동 애니
         animator.SetBool("Move", direction.sqrMagnitude > 0.0001f);
 
-        // === 방향 전환 ===
         if (direction.sqrMagnitude > 0.0001f)
         {
             lastNonZeroInput = direction;
@@ -76,16 +89,11 @@ public class TopDownMovement : MonoBehaviour, IDamageable
     private void ApplyFacing(Vector2 dir)
     {
         if (spriteRenderer == null) return;
-        // 좌우만 전환: x 음수면 왼쪽 바라봄
         if (Mathf.Abs(dir.x) > 0.001f)
             spriteRenderer.flipX = dir.x < 0f;
-        // 필요하면 상하에 따른 레이어/애니 분기 여기에 추가 가능
     }
 
-    private void Inven()
-    {
-        inventory.SetActive(true);
-    }
+    private void Inven() => inventory.SetActive(true);
 
     private void Potion()
     {
@@ -97,51 +105,89 @@ public class TopDownMovement : MonoBehaviour, IDamageable
         potion.fillAmount = 1;
     }
 
+    // === Fire 수정본 ===
     private void Fire()
     {
-        GameObject nearestEnemy = FindNearestEnemy();
-        if (nearestEnemy != null)
+        if (isAttacking) return;
+        if (aim == null)
         {
-            Vector2 shootDirection = (nearestEnemy.transform.position - this.transform.position).normalized;
-            Arrow projectile = arrowPool.Get(this.transform.position, Quaternion.identity);
-            projectile.Initialize(shootDirection, 10, 5f);
+            Debug.LogWarning("[TopDownMovement] Aim(TopDownAimRotation) 참조가 필요합니다.");
+            return;
         }
-    }
 
-    private GameObject FindNearestEnemy()
-    {
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Monster");
-        GameObject nearestEnemy = null;
-        float shortestDistance = 10f;
-
-        foreach (var enemy in enemies)
+        IEnumerator Slash()
         {
-            float distance = Vector2.Distance(transform.position, enemy.transform.position);
-            if (distance < shortestDistance)
+            isAttacking = true;
+
+            if (!string.IsNullOrEmpty(attackTriggerName) && animator != null)
             {
-                shortestDistance = distance;
-                nearestEnemy = enemy;
+                animator.ResetTrigger(attackTriggerName);
+                animator.SetTrigger(attackTriggerName);
             }
+            animator.SetBool("Move", false);
+
+            attackIndex++;
+            bool isPower = false;
+            if (attackIndex >= 3)
+            {
+                isPower = true;
+                attackIndex = 0;
+            }
+
+            if (weaponRoot != null)
+                weaponRoot.localScale = isPower ? weaponDefaultScale * 2f : weaponDefaultScale;
+
+            if (weaponCollider != null)
+                weaponCollider.enabled = true;
+
+            aim.SetOverride(true);
+
+            float center = aim.CurrentAimAngle;
+            float halfArc = slashArcDeg * 0.5f;
+            float startAngle = center + halfArc;
+            float endAngle = center - halfArc;
+
+            float elapsed = 0f;
+            while (elapsed < slashDuration)
+            {
+                float t = elapsed / slashDuration;
+                float curr = Mathf.Lerp(startAngle, endAngle, t);
+                aim.SetAngleDeg(curr);
+
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+            aim.SetAngleDeg(endAngle);
+
+            if (weaponCollider != null)
+                weaponCollider.enabled = false;
+
+            if (weaponRoot != null)
+                weaponRoot.localScale = weaponDefaultScale;
+
+            aim.SetOverride(false);
+            isAttacking = false;
+
+            animator.SetBool("Move", movementDirection.sqrMagnitude > 0.0001f);
+            if (movementDirection.sqrMagnitude > 0.0001f)
+                ApplyFacing(movementDirection);
         }
-        return nearestEnemy;
+
+        StartCoroutine(Slash());
     }
 
     private void Evasion()
     {
-        if (isEvasion) return;
+        if (isEvasion || isAttacking) return;
 
         if (PlayerStatus.Instance.curruntStamina >= 50)
         {
             PlayerStatus.Instance.curruntStamina -= 50;
 
-            // 회피 애니 트리거
             animator.ResetTrigger("Evasion");
             animator.SetTrigger("Evasion");
-
-            // 회피 중 이동 애니 끔
             animator.SetBool("Move", false);
 
-            // 회피 방향: 입력 없으면 마지막 방향 유지(있다면 네가 쓰던 변수 기준으로)
             Vector2 dir = (movementDirection.sqrMagnitude > 0.0001f) ? movementDirection : Vector2.right;
             StartCoroutine(EvasionCoroutine(dir.normalized));
         }
@@ -161,7 +207,6 @@ public class TopDownMovement : MonoBehaviour, IDamageable
         movementRigidbody.velocity = Vector2.zero;
         isEvasion = false;
 
-        // 회피 끝난 후 현재 입력 기준으로 방향/애니 재보정
         animator.SetBool("Move", movementDirection.sqrMagnitude > 0.0001f);
         if (movementDirection.sqrMagnitude > 0.0001f)
             ApplyFacing(movementDirection);
@@ -169,7 +214,7 @@ public class TopDownMovement : MonoBehaviour, IDamageable
 
     private void FixedUpdate()
     {
-        if (!isEvasion)
+        if (!isEvasion && !isAttacking)
         {
             ApplyMovement(movementDirection);
         }
@@ -178,8 +223,6 @@ public class TopDownMovement : MonoBehaviour, IDamageable
     private void ApplyMovement(Vector2 direction)
     {
         movementRigidbody.velocity = direction * 5;
-
-        // 이동 중에도 방향 유지 보정(옵션)
         if (direction.sqrMagnitude > 0.0001f)
             ApplyFacing(direction);
     }

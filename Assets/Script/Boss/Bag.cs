@@ -108,19 +108,20 @@ public class BagMonster : Monster
         cooldown = chargeInterval;
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
         if (!isCharging) return;
 
-        if (other.CompareTag("Player"))
+        if (collision.collider.CompareTag("Player"))
         {
-            var player = other.GetComponent<TopDownMovement>();
+            var player = collision.collider.GetComponent<TopDownMovement>();
             if (player != null)
                 player.TakeDamage(attackDamage);
-            return; // 플레이어는 맞고 계속 돌진
+            // 플레이어는 맞고 계속 돌진
+            return;
         }
 
-        if (other.CompareTag("Wall"))
+        if (collision.collider.CompareTag("Wall"))
         {
             // 벽 충돌 시 돌진 종료
             isCharging = false;
