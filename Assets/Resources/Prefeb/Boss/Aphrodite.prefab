@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4054644598582027247}
   - component: {fileID: 5010547338366654682}
   - component: {fileID: 5092142824559235210}
-  m_Layer: 10
+  m_Layer: 8
   m_Name: Aphrodite
   m_TagString: Monster
   m_Icon: {fileID: 0}

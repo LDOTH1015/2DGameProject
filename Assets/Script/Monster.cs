@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Monster : MonoBehaviour, IDamageable
@@ -94,7 +95,7 @@ public class Monster : MonoBehaviour, IDamageable
 
     public bool IsDeadMan()
     {
-        this.gameObject.SetActive(false);
+        Destroy(this.gameObject);
         return true;
     }
 

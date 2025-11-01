@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4876035175157188021}
   - component: {fileID: 738055568739243720}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Range
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 8004359768206359241}
   - component: {fileID: 7257898706990152057}
   - component: {fileID: 4841361193845660292}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Bag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -277,7 +277,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6406815760574177882}
   - component: {fileID: 277539949941801428}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: RangeBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -327,7 +327,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1018267140953901163}
   - component: {fileID: 743996787634132220}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: RangeBackGround
   m_TagString: Untagged
   m_Icon: {fileID: 0}
